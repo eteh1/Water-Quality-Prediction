@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+
+# Load data
+data = pd.DataFrame({
+    "Borehole": ["BH1", "BH2", "BH3", "BH4", "BH5", "BH6", "BH7", "BH8", "BH9", "BH10"],  # Add all boreholes
+    "Lat": [5.036889, 5.01975, 5.016722, 5.002366, 4.957417, 4.94325, 4.908472, 4.929167, 4.917722, 4.91175],
+    "Long": [6.405972, 6.398167, 6.396528, 6.387691, 6.35375, 6.324806, 6.337083, 6.300806, 6.317583, 6.305972],
+    "pH": [6.12, 6.3, 6.38, 6.1, 5.99, 5.93, 5.6, 6.69, 6.14, 6.74],
+    "EC": [406, 715, 857, 782, 164, 175, 763, 1156, 269, 1652],
+    "TDS": [203, 356, 430, 391, 82, 84, 383, 578, 135, 826],
+    "NO3": [0.36, 0.165, 0.335, 0.175, 0.165, 0.094, 0.085, 0.096, 0.348, 0.42],
+    "Cl": [39, 15, 21, 14, 14, 16, 14, 22, 34, 47],
+    "SO4": [1.4, 0.8, 1.67, 0.86, 0.82, 0.48, 0.45, 0.5, 1.75, 2.1],
+    "TA": [26, 15, 17, 19, 3, 5, 16, 15, 16, 15],
+    "TH": [25, 45, 18, 37, 35, 32, 30, 46, 101, 45],
+    "Ca": [22.4, 8.5, 13.7, 8.85, 8.6, 9, 7.4, 12.48, 20, 27.86],
+    "Mg": [6.35, 2.48, 3, 2.5, 2.76, 2.85, 2.38, 3.62, 5.65, 7.5],
+    "Na": [10.86, 4, 6.5, 4.85, 4.54, 5.2, 4.74, 5.8, 9.95, 13.58],
+    "K": [4.2, 1.46, 1.55, 0.76, 1.2, 1.4, 1.2, 1.8, 4, 4.65],
+    "Fe": [0.16, 0.14, 0.24, 0.12, 0.08, 0.13, 0.18, 0.17, 0.2, 0.13],
+    "WQI": [42.12, 53.98, 62.89, 55.40, 22.86, 24.76, 55.18, 78.65, 42.97, 108.14]  # Water Quality Index
+})
+
+# Define features and target
+X = data.drop(columns=["Borehole", "WQI"])
+y = data["WQI"]
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a model
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate model
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"Mean Absolute Error: {mae}")
+print(f"R² Score: {r2}")
+
+# Predict water quality for a new sample
+new_sample = np.array([[5.5, 400, 200, 0.2, 20, 1.5, 10, 30, 15, 5, 8, 2, 6, 1.5, 0.2]])
+predicted_wqi = model.predict(new_sample)
+print(f"Predicted Water Quality Index: {predicted_wqi[0]}")
